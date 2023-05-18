@@ -1,7 +1,10 @@
-DEPLOYMENT_NAME: mlstudio-infra-dev
+TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME: stgtfbackenddev
+TERRAFORM_BACKEND_CONTAINER_NAME: cnt-tf-backend
+AZ_REGION: eastus2
 RESOURCE_GROUP_NAME: rg-plat-mlstudio-dev
+
+DEPLOYMENT_NAME: mlstudio-infra-dev
 INSTANCE_ID: "01"
-PRIMARY_REGION: eastus2
 PRIMARY_REGION_SHORT: eus2
 TAGS: "Cost_Center_ID:474000;Customer:Internal;Environment_Type:Dev;Product_Group:Luminate Platform"
 APP_OBJECT_ID: e5593d7d-429c-4bfc-98a3-c90f57026c97

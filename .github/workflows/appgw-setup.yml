@@ -22,22 +22,34 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Azure login
-      #   uses: azure/login@v1
-      #   with:
-      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
-      #     enable-AzPSSession: true
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Load environment variables
         uses: dcarbone/yaml-to-env-action@v1.0.0
         with:
           debug: '${{ inputs.debug }}'
-          yaml-file: './.github/config/${{ inputs.environment }}.yml'
+          yaml-file: './config/${{ inputs.environment }}.yml'
           yq-version: '4.27.5'
 
-      - name: Print one env
+      - name: Install Terraform
+        uses: autero1/action-terraform@v1.1.1
+        with:
+          terraform_version: 1.2.8
+
+      - name: Create Storage Account For Terraform Backend(if not exists)
         run: |
-          echo ${{ env.RESOURCE_GROUP_NAME }}
+          chmod +x ./scripts/create-tf-backend-if-not-exists.sh
+          ./.github/create-tf-backend-if-not-exists.sh --resource-group ${{ env.RESOURCE_GROUP_NAME }} --location ${{ env.AZ_REGION }} \
+                         --storage-account-name ${{ env.TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME }} --container-name ${{ env.TERRAFORM_BACKEND_CONTAINER_NAME }}
+
+      - name: Initialize Terraform for Stratosphere
+        run: terraform init -input=false -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" -backend-config="storage_account_name=${{ env.TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=${{ env.TERRAFORM_BACKEND_CONTAINER_NAME }}"
+        working-directory: scripts/${{ inputs.environment }}
+
+
 
       # - name: Run app gateway deployment bicep script
       #   uses: azure/CLI@v1
