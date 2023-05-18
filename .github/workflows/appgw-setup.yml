@@ -19,9 +19,8 @@ jobs:
           fetch-depth: 0
 
       - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+        run: |
+          az login --service-principal -u ${{ secrets.AZ_CLIENT_ID }} -p ${{ secrets.AZ_CLIENT_SECRET }} --tenant ${{ secrets.AZ_TENANT }}
 
       - name: Load environment variables
         uses: dcarbone/yaml-to-env-action@v1.0.0
