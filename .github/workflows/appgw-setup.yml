@@ -3,21 +3,16 @@ name: "Setup API Gateway"
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: The environment where the app gateway needs to be setup.
-        type: choice
-        default: dev
+      env:
+        type: environment
+        description: 'Name of the environment in which app gateway needs to be setup'
         required: true
-        options:
-        - dev
-        - qa
-        - prod
 
 jobs:
   create-app-gateway:
     runs-on: ubuntu-latest
     environment: 
-      name: ${{ github.event.inputs.environment }}
+      name: ${{ github.event.inputs.env }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -32,7 +27,7 @@ jobs:
         uses: dcarbone/yaml-to-env-action@v1.0.0
         with:
           debug: '${{ inputs.debug }}'
-          yaml-file: './config/${{ github.event.inputs.environment }}.yml'
+          yaml-file: './config/${{ github.event.inputs.env }}.yml'
           yq-version: '4.27.5'
 
       - name: Install Terraform
@@ -48,7 +43,7 @@ jobs:
 
       - name: Initialize Terraform for Stratosphere
         run: terraform init -input=false -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" -backend-config="storage_account_name=${{ env.TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=${{ env.TERRAFORM_BACKEND_CONTAINER_NAME }}"
-        working-directory: scripts/${{ github.event.inputs.environment }}
+        working-directory: scripts/${{ github.event.inputs.env }}
 
 
 
