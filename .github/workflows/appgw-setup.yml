@@ -23,6 +23,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: az login
+        run: |
+          az login --service-principal -u ${{ env.CLIENT_ID }} -p ${{ env.CLIENT_SECRET }} --tenant ${{ env.TENANT_ID }}
+
       - name: Azure login
         uses: azure/login@v1
         with:
