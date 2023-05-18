@@ -38,7 +38,7 @@ jobs:
       - name: Create Storage Account For Terraform Backend(if not exists)
         run: |
           chmod +x ./scripts/create-tf-backend-if-not-exists.sh
-          ./.github/create-tf-backend-if-not-exists.sh --resource-group ${{ env.RESOURCE_GROUP_NAME }} --location ${{ env.AZ_REGION }} \
+          ./scripts/create-tf-backend-if-not-exists.sh --resource-group ${{ env.RESOURCE_GROUP_NAME }} --location ${{ env.AZ_REGION }} \
                          --storage-account-name ${{ env.TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME }} --container-name ${{ env.TERRAFORM_BACKEND_CONTAINER_NAME }}
 
       - name: Initialize Terraform for Stratosphere
