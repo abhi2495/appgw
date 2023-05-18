@@ -20,10 +20,10 @@ jobs:
       
       - name: Storing Azure Credentials as Env variables
         run: | 
-          echo "ARM_CLIENT_ID=$(echo ${{ secrets.AZURE_CREDENTIALS }} | jq '.clientId')" >> $GITHUB_ENV
-          echo "ARM_CLIENT_SECRET=$(echo ${{ secrets.AZURE_CREDENTIALS }} | jq '.clientSecret')" >> $GITHUB_ENV
-          echo "ARM_SUBSCRIPTION_ID=$(echo ${{ secrets.AZURE_CREDENTIALS }} | jq '.tenantId')" >> $GITHUB_ENV
-          echo "ARM_TENANT_ID=$(echo ${{ secrets.AZURE_CREDENTIALS }} | jq '.subscriptionId')" >> $GITHUB_ENV
+          echo "ARM_CLIENT_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq '.clientId')" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq '.clientSecret')" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq '.tenantId')" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq '.subscriptionId')" >> $GITHUB_ENV
 
       - name: Azure login
         uses: azure/login@v1
