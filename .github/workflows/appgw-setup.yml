@@ -1,0 +1,67 @@
+name: "Setup API Gateway"
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: The environment where the app gateway needs to be setup.
+        type: choice
+        default: dev
+        required: true
+        options:
+        - dev
+        - qa
+        - prod
+
+jobs:
+  create-app-gateway:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # - name: Azure login
+      #   uses: azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+      #     enable-AzPSSession: true
+
+      - name: Load environment variables
+        uses: dcarbone/yaml-to-env-action@v1.0.0
+        with:
+          debug: '${{ inputs.debug }}'
+          yaml-file: './.github/config/${{ inputs.environment }}.yml'
+          yq-version: '4.27.5'
+
+      - name: Print one env
+        run: |
+          echo ${{ env.RESOURCE_GROUP_NAME }}
+
+      # - name: Run app gateway deployment bicep script
+      #   uses: azure/CLI@v1
+      #   with:
+      #     azcliversion: 2.30.0
+      #     inlineScript: |
+      #       az deployment group create --name="${{ env.DEPLOYMENT_NAME }}" \
+      #         --resource-group "${{ env.RESOURCE_GROUP_NAME }}" \
+      #         --template-file "./.github/scripts/appgw-deploy.bicep" \
+      #         --parameters rgName="${{ env.RESOURCE_GROUP_NAME }}" \
+      #                     instanceName="${{ inputs.environment }}" \
+      #                     instanceId="${{ env.INSTANCE_ID }}" \
+      #                     primaryLocation="${{ env.PRIMARY_REGION }}" \
+      #                     primaryLocationShort="${{ env.PRIMARY_REGION_SHORT }}" \
+      #                     tags="${{ env.TAGS }}" \
+      #                     appObjectId="${{ env.APP_OBJECT_ID }}" \
+      #                     primaryRegionVnet_rgName="${{ env.VNET_RESOURCE_GROUP_NAME }}" \
+      #                     primaryRegionVnetName="${{ env.VNET_NAME }}" \
+      #                     primaryRegionRouteTableName="${{ env.VNET_ROUTE_TABLE }}" \
+      #                     primaryAPPGSubnetCIDR="${{ env.VNET_CIDR_APPGW }}" \
+      #                     letsEncryptPublicCertificateName="${{ env.LETSENCRYPT_PUBLIC_CERTIFICATE_NAME }}" \
+      #                     letsEncryptPrivateCertificateName="${{ env.LETSENCRYPT_PRIVATE_CERTIFICATE_NAME }}" \
+      #                     oasContainerName="${{ env.OAS_CONTAINER_NAME }}" \
+      #                     primaryAppGatewayPrivateIpAddress="${{ env.APP_GATEWAY_PRIVATE_IP_ADDRESS }}" \
+      #                     primaryAPIMPrivateIpAddress="${{ env.APIM_PRIVATE_IP_ADDRESS }}" \
+      #                     userObjectIdsForKVAccess="${{ env.USER_OBJECT_IDS_FOR_KV_ACCESS }}"
+
