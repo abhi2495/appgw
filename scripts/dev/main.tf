@@ -10,3 +10,7 @@ terraform {
     key = "mlstudio.tfstate"
   }
 }
+
+output "project_name" {
+  value = "abcd"
+}
