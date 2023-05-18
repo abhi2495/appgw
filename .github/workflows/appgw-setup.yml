@@ -17,15 +17,11 @@ jobs:
   create-app-gateway:
     runs-on: ubuntu-latest
     environment: 
-      name: ${{ inputs.environment }}
+      name: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: az login
-        run: |
-          az login --service-principal -u ${{ env.CLIENT_ID }} -p ${{ env.CLIENT_SECRET }} --tenant ${{ env.TENANT_ID }}
 
       - name: Azure login
         uses: azure/login@v1
@@ -36,7 +32,7 @@ jobs:
         uses: dcarbone/yaml-to-env-action@v1.0.0
         with:
           debug: '${{ inputs.debug }}'
-          yaml-file: './config/${{ inputs.environment }}.yml'
+          yaml-file: './config/${{ github.event.inputs.environment }}.yml'
           yq-version: '4.27.5'
 
       - name: Install Terraform
@@ -52,7 +48,7 @@ jobs:
 
       - name: Initialize Terraform for Stratosphere
         run: terraform init -input=false -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" -backend-config="storage_account_name=${{ env.TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=${{ env.TERRAFORM_BACKEND_CONTAINER_NAME }}"
-        working-directory: scripts/${{ inputs.environment }}
+        working-directory: scripts/${{ github.event.inputs.environment }}
 
 
 
