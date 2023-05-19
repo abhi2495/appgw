@@ -11,6 +11,9 @@ terraform {
   }
 }
 
+provider "azurerm" {
+  features {}
+}
 
 resource "azurerm_user_assigned_identity" "mlstudio" {
   location            = var.AZ_REGION
