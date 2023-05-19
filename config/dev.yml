@@ -3,7 +3,7 @@ TERRAFORM_BACKEND_CONTAINER_NAME: cnt-tf-backend
 TF_VAR_AZ_REGION: eastus2
 TF_VAR_RESOURCE_GROUP_NAME: rg-plat-mlstudio-dev
 TF_VAR_MANAGED_IDENTITY_NAME: mi-plat-mlstudio-dev
-TF_VAR_TAGS: "Cost_Center_ID:474000,Customer:Internal,Environment_Type:Dev,Product_Group:Luminate Platform"
+TF_VAR_TAGS: "{\"Cost_Center_ID\":\"474000\",\"Customer\":\"Internal\",\"Environment_Type\":\"Dev\",\"Product_Group\":\"Luminate Platform\"}"
 
 DEPLOYMENT_NAME: mlstudio-infra-dev
 INSTANCE_ID: "01"
