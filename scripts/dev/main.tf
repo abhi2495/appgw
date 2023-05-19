@@ -11,6 +11,11 @@ terraform {
   }
 }
 
-output "project_name" {
-  value = "abcd"
+
+resource "azurerm_user_assigned_identity" "mlstudio" {
+  location            = var.AZ_REGION
+  name                = var.MANAGED_IDENTITY_NAME
+  resource_group_name = var.RESOURCE_GROUP_NAME
+  tags                = var.TAGS
 }
+
