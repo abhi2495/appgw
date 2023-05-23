@@ -22,3 +22,10 @@ resource "azurerm_user_assigned_identity" "mlstudio" {
   tags                = var.TAGS
 }
 
+resource "azurerm_virtual_network" "mlstudio" {
+  name                = var.VNET_NAME
+  location            = var.AZ_REGION
+  resource_group_name = var.RESOURCE_GROUP_NAME
+  address_space       = ${split(",", var.TF_VAR_VNET_ADDRESS)}
+  tags                = var.TAGS
+}
