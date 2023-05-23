@@ -14,3 +14,11 @@ variable "TAGS" {
   type        = map(string)
   description = "Tags to be included on the resources"
 }
+
+variable "VNET_NAME" {
+  description = "Name of the virtual network"
+}
+
+variable "VNET_ADDRESS" {
+  description = "The address space that is used the virtual network. We can supply more than one address space using comma separated values."
+}
