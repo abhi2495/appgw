@@ -53,10 +53,13 @@ resource "azurerm_public_ip" "mlstudio" {
 }
 
 locals {
-  frontend_port_name             = "appgw-feport"
-  frontend_ip_configuration_name = "appgw-feip"
-  gateway_ip_configuration_name = "appgw-ip-config"
-
+  frontend_port_name              = "appgw-feport"
+  frontend_ip_configuration_name  = "appgw-feip"
+  gateway_ip_configuration_name   = "appgw-ip-config"
+  backend_address_pool_name       = "appgw-defaultbackendaddresspool"
+  http_setting_name               = "appgw-defaulthttpsetting"
+  health_probe_name               = "appgw-defaultprobe-http"
+  http_listener_name              = "appgw-default-httplistner"
 }
 
 resource "azurerm_application_gateway" "mlstudio" {
@@ -80,5 +83,41 @@ resource "azurerm_application_gateway" "mlstudio" {
   frontend_port {
     name = local.frontend_port_name
     port = 80
+  }
+  backend_address_pool {
+    name = local.backend_address_pool_name
+  }
+  probe {
+    name = local.health_probe_name
+    interval = 30
+    protocol = "Http"
+    path = "/"
+    timeout = 30
+    unhealthy_threshold = 3
+    pick_host_name_from_backend_http_settings = true
+  }
+  backend_http_settings {
+    name                  = local.http_setting_name
+    cookie_based_affinity = "Disabled"
+    port                  = 80
+    protocol              = "Http"
+    request_timeout       = 30
+    probe_name            = local.health_probe_name
+    connection_draining {
+      enabled = false
+    }
+  }
+   http_listener {
+    name                           = local.http_listener_name
+    frontend_ip_configuration_name = local.frontend_ip_configuration_name
+    frontend_port_name             = local.frontend_port_name
+    protocol                       = "Http"
+  }
+  request_routing_rule {
+    name                       = local.request_routing_rule_name
+    rule_type                  = "Basic"
+    http_listener_name         = local.http_listener_name
+    backend_address_pool_name  = local.backend_address_pool_name
+    backend_http_settings_name = local.http_setting_name
   }
 }
