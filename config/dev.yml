@@ -4,13 +4,23 @@ TF_VAR_AZ_REGION: eastus2
 TF_VAR_RESOURCE_GROUP_NAME: rg-plat-mlstudio-dev
 TF_VAR_MANAGED_IDENTITY_NAME: mi-plat-mlstudio-dev
 TF_VAR_TAGS: '{"Cost_Center_ID":"474000","Customer":"Internal","Environment_Type":"Dev","Product_Group":"Luminate Platform","Created_By":"Terraform"}'
-TF_VAR_VNET_NAME: vnet-plat-mlstudio-dev
-TF_VAR_VNET_ADDRESS: "10.1.0.0/16"
-TF_VAR_SUBNETS:
-  - name: "default"
-    address_prefix: "10.1.0.0/24"
-  - name: "akssubnet"
-    address_prefix: "10.1.16.0/20"
+TF_VAR_VNET:
+  NAME: vnet-plat-mlstudio-dev
+  ADDRESS: "10.1.0.0/16"
+TF_VAR_APPGW_SUBNET:
+  NAME: appgwsubnet
+  ADDRESS_PREFIX: 10.1.0.0/24
+TF_VAR_AKS_SUBNET:
+  NAME: akssubnet
+  ADDRESS_PREFIX: 10.1.16.0/20
+TF_VAR_PUBLIC_IP:
+  NAME: public-ip-plat-mlstudio-dev
+  ALLOCATION_METHOD: static
+TF_VAR_APP_GATEWAY:
+  NAME: appgw-plat-mlstudio-dev
+  SKU_NAME: WAF_v2
+  SKU_TIER: WAF_v2
+  SKU_CAPACITY: 2
 
 DEPLOYMENT_NAME: mlstudio-infra-dev
 INSTANCE_ID: "01"
