@@ -60,6 +60,7 @@ locals {
   http_setting_name               = "appgw-defaulthttpsetting"
   health_probe_name               = "appgw-defaultprobe-http"
   http_listener_name              = "appgw-default-httplistner"
+  request_routing_rule_name       = "appgw-rqrt"
 }
 
 resource "azurerm_application_gateway" "mlstudio" {
