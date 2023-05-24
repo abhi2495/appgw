@@ -22,3 +22,8 @@ variable "VNET_NAME" {
 variable "VNET_ADDRESS" {
   description = "The address space that is used the virtual network. We can supply more than one address space using comma separated values."
 }
+
+variable "SUBNETS" {
+  description = "The subnets to be associated with the virtual network"
+  default = []
+}

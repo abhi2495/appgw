@@ -28,4 +28,20 @@ resource "azurerm_virtual_network" "mlstudio" {
   resource_group_name = var.RESOURCE_GROUP_NAME
   address_space       = split(",", var.VNET_ADDRESS)
   tags                = var.TAGS
+
+  dynamic "subnet" {
+    for_each = var.SUBNETS
+    content {
+      name            = subnet.value["name"]
+      address_prefix  = setting.value["address_prefix"]
+    }
+  }
 }
+
+# resource "azurerm_public_ip" "example" {
+#   name                = "acceptanceTestPublicIp1"
+#   resource_group_name = azurerm_resource_group.example.name
+#   location            = azurerm_resource_group.example.location
+#   allocation_method   = "Static"
+#   tags                = var.TAGS
+# }
