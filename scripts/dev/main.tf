@@ -100,20 +100,22 @@ resource "azurerm_application_gateway" "mlstudio" {
     name = local.backend_address_pool_name
   }
   probe {
-    name                = local.health_probe_name
-    interval            = 30
-    protocol            = "Http"
-    path                = "/"
-    timeout             = 30
-    unhealthy_threshold = 3
+    name                                      = local.health_probe_name
+    interval                                  = 30
+    protocol                                  = "Http"
+    path                                      = "/"
+    timeout                                   = 30
+    unhealthy_threshold                       = 3
+    pick_host_name_from_backend_http_settings = true
   }
   backend_http_settings {
-    name                  = local.http_setting_name
-    cookie_based_affinity = "Disabled"
-    port                  = 80
-    protocol              = "Http"
-    request_timeout       = 30
-    probe_name            = local.health_probe_name
+    name                                = local.http_setting_name
+    cookie_based_affinity               = "Disabled"
+    port                                = 80
+    protocol                            = "Http"
+    request_timeout                     = 30
+    probe_name                          = local.health_probe_name
+    pick_host_name_from_backend_address = true
   }
   http_listener {
     name                           = local.http_listener_name
