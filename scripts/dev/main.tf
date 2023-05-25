@@ -104,9 +104,6 @@ resource "azurerm_application_gateway" "mlstudio" {
     protocol              = "Http"
     request_timeout       = 30
     probe_name            = local.health_probe_name
-    connection_draining {
-      enabled = false
-    }
   }
    http_listener {
     name                           = local.http_listener_name
