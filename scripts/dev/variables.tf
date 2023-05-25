@@ -62,3 +62,27 @@ variable "APP_GATEWAY_SKU_TIER" {
 variable "APP_GATEWAY_SKU_CAPACITY" {
   description = "The Capacity of the SKU to use for this Application Gateway. When using a V1 SKU this value must be between 1 and 32, and 1 to 125 for a V2 SKU. This property is optional if autoscale_configuration is set."
 }
+
+variable "AKS_NAME" {
+  description = "The name of the Managed Kubernetes Cluster to create."
+}
+
+variable "AKS_NETWORK_PLUGIN" {
+  description = "Network plugin to use for networking. Currently supported values are azure, kubenet and none."
+}
+
+variable "AKS_SERVICE_CIDR" {
+  description = "The Network Range used by the Kubernetes service."
+}
+
+variable "AKS_DNS_SERVICE_IP" {
+  description = "IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns)."
+}
+
+variable "AKS_DEFAULT_NODE_POOL_COUNT" {
+  description = "The initial number of nodes which should exist in this Node Pool. If specified this must be between 1 and 1000."
+}
+
+variable "AKS_DEFAULT_NODE_POOL_VM_SIZE" {
+  description = "The size of the Virtual Machine, such as Standard_DS2_v2"
+}

@@ -53,14 +53,14 @@ resource "azurerm_public_ip" "mlstudio" {
 }
 
 locals {
-  frontend_port_name              = "appgw-feport"
-  frontend_ip_configuration_name  = "appgw-feip"
-  gateway_ip_configuration_name   = "appgw-ip-config"
-  backend_address_pool_name       = "appgw-defaultbackendaddresspool"
-  http_setting_name               = "appgw-defaulthttpsetting"
-  health_probe_name               = "appgw-defaultprobe-http"
-  http_listener_name              = "appgw-default-httplistner"
-  request_routing_rule_name       = "appgw-rqrt"
+  frontend_port_name             = "appgw-feport"
+  frontend_ip_configuration_name = "appgw-feip"
+  gateway_ip_configuration_name  = "appgw-ip-config"
+  backend_address_pool_name      = "appgw-defaultbackendaddresspool"
+  http_setting_name              = "appgw-defaulthttpsetting"
+  health_probe_name              = "appgw-defaultprobe-http"
+  http_listener_name             = "appgw-default-httplistner"
+  request_routing_rule_name      = "appgw-rqrt"
 }
 
 resource "azurerm_application_gateway" "mlstudio" {
@@ -89,12 +89,12 @@ resource "azurerm_application_gateway" "mlstudio" {
     name = local.backend_address_pool_name
   }
   probe {
-    name = local.health_probe_name
-    interval = 30
-    protocol = "Http"
-    path = "/"
-    timeout = 30
-    unhealthy_threshold = 3
+    name                                      = local.health_probe_name
+    interval                                  = 30
+    protocol                                  = "Http"
+    path                                      = "/"
+    timeout                                   = 30
+    unhealthy_threshold                       = 3
     pick_host_name_from_backend_http_settings = true
   }
   backend_http_settings {
@@ -105,7 +105,7 @@ resource "azurerm_application_gateway" "mlstudio" {
     request_timeout       = 30
     probe_name            = local.health_probe_name
   }
-   http_listener {
+  http_listener {
     name                           = local.http_listener_name
     frontend_ip_configuration_name = local.frontend_ip_configuration_name
     frontend_port_name             = local.frontend_port_name
@@ -117,5 +117,36 @@ resource "azurerm_application_gateway" "mlstudio" {
     http_listener_name         = local.http_listener_name
     backend_address_pool_name  = local.backend_address_pool_name
     backend_http_settings_name = local.http_setting_name
+  }
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.mlstudio.id]
+  }
+}
+
+resource "azurerm_kubernetes_cluster" "mlstudio" {
+  name                = var.AKS_NAME
+  location            = var.AZ_REGION
+  resource_group_name = var.RESOURCE_GROUP_NAME
+  tags                = var.TAGS
+
+  ingress_application_gateway {
+    gateway_id = azurerm_application_gateway.mlstudio.id
+  }
+  network_profile {
+    network_plugin = var.AKS_NETWORK_PLUGIN
+    service_cidr   = var.AKS_SERVICE_CIDR
+    dns_service_ip = var.AKS_DNS_SERVICE_IP
+  }
+  default_node_pool {
+    name           = "default"
+    node_count     = var.AKS_DEFAULT_NODE_POOL_COUNT
+    vm_size        = var.AKS_DEFAULT_NODE_POOL_VM_SIZE
+    vnet_subnet_id = azurerm_subnet.aks.id
+  }
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.mlstudio.id]
   }
 }

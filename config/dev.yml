@@ -21,6 +21,14 @@ TF_VAR_APP_GATEWAY:
   SKU_NAME: WAF_v2
   SKU_TIER: WAF_v2
   SKU_CAPACITY: 2
+TF_VAR_AKS:
+  NAME: aks-plat-mlstudio-dev
+  NETWORK_PLUGIN: azure
+  SERVICE_CIDR: 10.0.0.0/16
+  DNS_SERVICE_IP: 10.0.0.10
+  DEFAULT_NODE_POOL:
+    COUNT: 1
+    VM_SIZE: Standard_B2s
 
 DEPLOYMENT_NAME: mlstudio-infra-dev
 INSTANCE_ID: "01"
