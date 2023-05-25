@@ -106,10 +106,12 @@ variable "AKS_DEFAULT_NODE_POOL_TYPE" {
 
 variable "AKS_DEFAULT_NODE_POOL_MAX_NODE_COUNT" {
   description = "The maximum number of nodes which should exist in this Node Pool. If specified this must be between 1 and 1000."
+  default     = 1
 }
 
 variable "AKS_DEFAULT_NODE_POOL_MIN_NODE_COUNT" {
   description = "The minimum number of nodes which should exist in this Node Pool. If specified this must be between 1 and 1000."
+  default     = 1
 }
 
 variable "AKS_DEFAULT_NODE_POOL_OS_DISK_SIZE" {
