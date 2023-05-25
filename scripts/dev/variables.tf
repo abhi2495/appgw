@@ -86,3 +86,42 @@ variable "AKS_DEFAULT_NODE_POOL_COUNT" {
 variable "AKS_DEFAULT_NODE_POOL_VM_SIZE" {
   description = "The size of the Virtual Machine, such as Standard_DS2_v2"
 }
+
+variable "AKS_DNS_PREFIX" {
+  description = "DNS prefix specified when creating the managed cluster. Possible values must begin and end with a letter or number, contain only letters, numbers, and hyphens and be between 1 and 54 characters in length."
+}
+
+variable "AKS_DEFAULT_NODE_POOL_OS" {
+  description = "Specifies the OS SKU used by the agent pool. Possible values include: Ubuntu, CBLMariner, Mariner, Windows2019, Windows2022. If not specified, the default is Ubuntu if OSType=Linux or Windows2019 if OSType=Windows. And the default Windows OSSKU will be changed to Windows2022 after Windows2019 is deprecated."
+}
+
+variable "AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING" {
+  type        = bool
+  description = "Should the Kubernetes Auto Scaler be enabled for this Node Pool?"
+}
+
+variable "AKS_DEFAULT_NODE_POOL_TYPE" {
+  description = "The type of Node Pool which should be created. Possible values are AvailabilitySet and VirtualMachineScaleSets"
+}
+
+variable "AKS_DEFAULT_NODE_POOL_MAX_NODE_COUNT" {
+  description = "The maximum number of nodes which should exist in this Node Pool. If specified this must be between 1 and 1000."
+}
+
+variable "AKS_DEFAULT_NODE_POOL_MIN_NODE_COUNT" {
+  description = "The minimum number of nodes which should exist in this Node Pool. If specified this must be between 1 and 1000."
+}
+
+variable "AKS_DEFAULT_NODE_POOL_OS_DISK_SIZE" {
+  description = "The size of the OS Disk in GB which should be used for each agent in the Node Pool."
+}
+
+variable "AKS_DEFAULT_NODE_POOL_MAX_PODS" {
+  description = "The maximum number of pods that can run on each agent."
+}
+
+variable "AKS_DEFAULT_NODE_POOL_ENABLE_NODE_PUBLIC_IP" {
+  type        = bool
+  description = "Should nodes in this Node Pool have a Public IP Address?"
+  default     = false
+}

@@ -26,9 +26,16 @@ TF_VAR_AKS:
   NETWORK_PLUGIN: azure
   SERVICE_CIDR: 10.0.0.0/16
   DNS_SERVICE_IP: 10.0.0.10
+  DNS_PREFIX: mlstudio-dev
   DEFAULT_NODE_POOL:
     COUNT: 1
     VM_SIZE: Standard_B2s
+    OS: Ubuntu
+    ENABLE_AUTOSCALING: false
+    TYPE: VirtualMachineScaleSets
+    OS_DISK_SIZE: 128
+    MAX_PODS: 30
+    ENABLE_NODE_PUBLIC_IP: false
 
 DEPLOYMENT_NAME: mlstudio-infra-dev
 INSTANCE_ID: "01"

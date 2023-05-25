@@ -129,6 +129,7 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
   location            = var.AZ_REGION
   resource_group_name = var.RESOURCE_GROUP_NAME
   tags                = var.TAGS
+  dns_prefix          = var.AKS_DNS_PREFIX
 
   ingress_application_gateway {
     gateway_id = azurerm_application_gateway.mlstudio.id
@@ -139,14 +140,21 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
     dns_service_ip = var.AKS_DNS_SERVICE_IP
   }
   default_node_pool {
-    name           = "default"
-    node_count     = var.AKS_DEFAULT_NODE_POOL_COUNT
-    vm_size        = var.AKS_DEFAULT_NODE_POOL_VM_SIZE
-    vnet_subnet_id = azurerm_subnet.aks.id
+    name                  = "default"
+    node_count            = var.AKS_DEFAULT_NODE_POOL_COUNT
+    vm_size               = var.AKS_DEFAULT_NODE_POOL_VM_SIZE
+    vnet_subnet_id        = azurerm_subnet.aks.id
+    os_sku                = var.AKS_DEFAULT_NODE_POOL_OS
+    os_disk_size_gb       = var.AKS_DEFAULT_NODE_POOL_OS_DISK_SIZE
+    enable_auto_scaling   = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING
+    type                  = var.AKS_DEFAULT_NODE_POOL_TYPE
+    max_count             = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING ? var.AKS_DEFAULT_NODE_POOL_MAX_NODE_COUNT : null
+    min_count             = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING ? var.AKS_DEFAULT_NODE_POOL_MIN_NODE_COUNT : null
+    max_pods              = var.AKS_DEFAULT_NODE_POOL_MAX_PODS
+    enable_node_public_ip = var.AKS_DEFAULT_NODE_POOL_ENABLE_NODE_PUBLIC_IP
   }
 
   identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.mlstudio.id]
+    type = "SystemAssigned"
   }
 }
