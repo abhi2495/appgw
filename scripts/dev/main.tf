@@ -148,8 +148,8 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
     os_disk_size_gb       = var.AKS_DEFAULT_NODE_POOL_OS_DISK_SIZE
     enable_auto_scaling   = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING
     type                  = var.AKS_DEFAULT_NODE_POOL_TYPE
-    max_count             = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING ? var.AKS_DEFAULT_NODE_POOL_MAX_NODE_COUNT : null
-    min_count             = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING ? var.AKS_DEFAULT_NODE_POOL_MIN_NODE_COUNT : null
+    max_count             = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING == true ? var.AKS_DEFAULT_NODE_POOL_MAX_NODE_COUNT : null
+    min_count             = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING == true ? var.AKS_DEFAULT_NODE_POOL_MIN_NODE_COUNT : null
     max_pods              = var.AKS_DEFAULT_NODE_POOL_MAX_PODS
     enable_node_public_ip = var.AKS_DEFAULT_NODE_POOL_ENABLE_NODE_PUBLIC_IP
   }
