@@ -100,13 +100,12 @@ resource "azurerm_application_gateway" "mlstudio" {
     name = local.backend_address_pool_name
   }
   probe {
-    name                                      = local.health_probe_name
-    interval                                  = 30
-    protocol                                  = "Http"
-    path                                      = "/"
-    timeout                                   = 30
-    unhealthy_threshold                       = 3
-    pick_host_name_from_backend_http_settings = true
+    name                = local.health_probe_name
+    interval            = 30
+    protocol            = "Http"
+    path                = "/"
+    timeout             = 30
+    unhealthy_threshold = 3
   }
   backend_http_settings {
     name                  = local.http_setting_name
