@@ -31,6 +31,9 @@ resource "azurerm_virtual_network" "mlstudio" {
 }
 
 resource "azurerm_subnet" "appgw" {
+  depends_on = [
+    azurerm_virtual_network.mlstudio
+  ]
   name                 = var.APPGW_SUBNET_NAME
   resource_group_name  = var.RESOURCE_GROUP_NAME
   virtual_network_name = azurerm_virtual_network.mlstudio.name
@@ -38,6 +41,9 @@ resource "azurerm_subnet" "appgw" {
 }
 
 resource "azurerm_subnet" "aks" {
+  depends_on = [
+    azurerm_virtual_network.mlstudio
+  ]
   name                 = var.AKS_SUBNET_NAME
   resource_group_name  = var.RESOURCE_GROUP_NAME
   virtual_network_name = azurerm_virtual_network.mlstudio.name
@@ -64,6 +70,11 @@ locals {
 }
 
 resource "azurerm_application_gateway" "mlstudio" {
+  depends_on = [
+    azurerm_public_ip.mlstudio,
+    azurerm_subnet.appgw,
+    azurerm_user_assigned_identity.mlstudio
+  ]
   name                = var.APP_GATEWAY_NAME
   resource_group_name = var.RESOURCE_GROUP_NAME
   location            = var.AZ_REGION
@@ -125,6 +136,10 @@ resource "azurerm_application_gateway" "mlstudio" {
 }
 
 resource "azurerm_kubernetes_cluster" "mlstudio" {
+  depends_on = [
+    azurerm_application_gateway.mlstudio,
+    azurerm_subnet.aks
+  ]
   name                = var.AKS_NAME
   location            = var.AZ_REGION
   resource_group_name = var.RESOURCE_GROUP_NAME
