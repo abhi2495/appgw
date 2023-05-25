@@ -76,13 +76,13 @@ variable "AKS_NETWORK_PLUGIN" {
   description = "Network plugin to use for networking. Currently supported values are azure, kubenet and none."
 }
 
-variable "AKS_SERVICE_CIDR" {
+/* variable "AKS_SERVICE_CIDR" {
   description = "The Network Range used by the Kubernetes service."
 }
 
 variable "AKS_DNS_SERVICE_IP" {
   description = "IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns)."
-}
+} */
 
 variable "AKS_DEFAULT_NODE_POOL_COUNT" {
   description = "The initial number of nodes which should exist in this Node Pool. If specified this must be between 1 and 1000."

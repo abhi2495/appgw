@@ -25,8 +25,6 @@ TF_VAR_APP_GATEWAY:
 TF_VAR_AKS:
   NAME: aks-plat-mlstudio-dev
   NETWORK_PLUGIN: azure
-  SERVICE_CIDR: 10.0.0.0/16
-  DNS_SERVICE_IP: 10.0.0.10
   DNS_PREFIX: mlstudio-dev
   DEFAULT_NODE_POOL:
     COUNT: 1

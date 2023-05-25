@@ -153,8 +153,8 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
   }
   network_profile {
     network_plugin = var.AKS_NETWORK_PLUGIN
-    service_cidr   = var.AKS_SERVICE_CIDR
-    dns_service_ip = var.AKS_DNS_SERVICE_IP
+    /* service_cidr   = var.AKS_SERVICE_CIDR
+    dns_service_ip = var.AKS_DNS_SERVICE_IP */
   }
   default_node_pool {
     name                  = "default"
