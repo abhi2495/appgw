@@ -55,6 +55,7 @@ resource "azurerm_public_ip" "mlstudio" {
   resource_group_name = var.RESOURCE_GROUP_NAME
   location            = var.AZ_REGION
   allocation_method   = var.PUBLIC_IP_ALLOCATION_METHOD
+  sku                 = var.PUBLIC_IP_SKU
   tags                = var.TAGS
 }
 

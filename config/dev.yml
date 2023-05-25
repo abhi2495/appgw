@@ -16,6 +16,7 @@ TF_VAR_AKS_SUBNET:
 TF_VAR_PUBLIC_IP:
   NAME: public-ip-plat-mlstudio-dev
   ALLOCATION_METHOD: Static
+  SKU: Standard
 TF_VAR_APP_GATEWAY:
   NAME: appgw-plat-mlstudio-dev
   SKU_NAME: WAF_v2

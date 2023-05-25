@@ -47,6 +47,11 @@ variable "PUBLIC_IP_ALLOCATION_METHOD" {
   description = "Defines the allocation method for this IP address. Possible values are Static or Dynamic."
 }
 
+variable "PUBLIC_IP_SKU" {
+  description = "The SKU of the Public IP. Accepted values are Basic and Standard. Defaults to Basic"
+  default     = "Basic"
+}
+
 variable "APP_GATEWAY_NAME" {
   description = "The name of the Application Gateway."
 }
