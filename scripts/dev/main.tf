@@ -140,7 +140,8 @@ resource "azurerm_application_gateway" "mlstudio" {
 resource "azurerm_kubernetes_cluster" "mlstudio" {
   depends_on = [
     azurerm_application_gateway.mlstudio,
-    azurerm_subnet.aks
+    azurerm_subnet.aks,
+    azurerm_user_assigned_identity.mlstudio
   ]
   name                = var.AKS_NAME
   location            = var.AZ_REGION
@@ -172,6 +173,7 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
   }
 
   identity {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.mlstudio.id]
   }
 }
