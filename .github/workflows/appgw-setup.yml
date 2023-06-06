@@ -58,7 +58,7 @@ jobs:
 
       - name: Destroy Terraform plan
         id: destroy
-        run: terraform destroy
+        run: terraform destroy -auto-approve
         working-directory: scripts/${{ github.event.inputs.env }}
 
       # - name: Create Terraform plan
