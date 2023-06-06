@@ -15,11 +15,24 @@ provider "azurerm" {
   features {}
 }
 
+data "azurerm_resource_group" "mlstudio" {
+  name = var.RESOURCE_GROUP_NAME
+}
+
 resource "azurerm_user_assigned_identity" "mlstudio" {
   location            = var.AZ_REGION
   name                = var.MANAGED_IDENTITY_NAME
   resource_group_name = var.RESOURCE_GROUP_NAME
   tags                = var.TAGS
+}
+
+resource "azurerm_role_assignment" "network_contributor_rg" {
+  depends_on = [
+    azurerm_user_assigned_identity.mlstudio
+  ]
+  scope                = data.azurerm_resource_group.mlstudio.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_user_assigned_identity.mlstudio.client_id
 }
 
 resource "azurerm_virtual_network" "mlstudio" {
@@ -136,6 +149,16 @@ resource "azurerm_application_gateway" "mlstudio" {
     identity_ids = [azurerm_user_assigned_identity.mlstudio.id]
   }
 }
+
+resource "azurerm_role_assignment" "contributor_rg" {
+  depends_on = [
+    azurerm_user_assigned_identity.mlstudio
+  ]
+  scope                = data.azurerm_resource_group.mlstudio.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_user_assigned_identity.mlstudio.client_id
+}
+
 
 resource "azurerm_kubernetes_cluster" "mlstudio" {
   depends_on = [
