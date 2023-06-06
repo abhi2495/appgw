@@ -56,11 +56,16 @@ jobs:
         run: terraform init -input=false -backend-config="resource_group_name=${{ env.TF_VAR_RESOURCE_GROUP_NAME }}" -backend-config="storage_account_name=${{ env.TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=${{ env.TERRAFORM_BACKEND_CONTAINER_NAME }}"
         working-directory: scripts/${{ github.event.inputs.env }}
 
-      - name: Create Terraform plan
-        id: plan
-        run: terraform plan -input=false -no-color
+      - name: Destroy Terraform plan
+        id: destroy
+        run: terraform destroy
         working-directory: scripts/${{ github.event.inputs.env }}
 
-      - name: Apply Terraform plan
-        run: terraform apply -auto-approve -input=false
-        working-directory: scripts/${{ github.event.inputs.env }}
+      # - name: Create Terraform plan
+      #   id: plan
+      #   run: terraform plan -input=false -no-color
+      #   working-directory: scripts/${{ github.event.inputs.env }}
+
+      # - name: Apply Terraform plan
+      #   run: terraform apply -auto-approve -input=false
+      #   working-directory: scripts/${{ github.event.inputs.env }}
