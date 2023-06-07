@@ -76,9 +76,14 @@ jobs:
 
   install-jupyterhub:
     runs-on: ubuntu-latest
+    needs: [create-azure-resources]
     environment:
       name: "${{ github.event.inputs.env }}"
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Azure login
         uses: azure/login@v1
         with:
