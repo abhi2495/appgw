@@ -120,5 +120,6 @@ jobs:
           ipAddress=$(az network public-ip show -n ${{ env.TF_VAR_PUBLIC_IP_NAME }} -g ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --query ipAddress -o tsv)
           echo $ipAddress
           sed -i 's|${JUPYTERHUB_NAMESPACE}|${{ env.TF_VAR_AKS_NAMESPACE_NAME }}|'  jupyterhub-ingress-config.yaml
+          echo "hello guys"
           sed -i "s|${APPGW_FRONTEND_IP}|$ipAddress|"  jupyterhub-ingress-config.yaml
           cat jupyterhub-ingress-config.yaml
