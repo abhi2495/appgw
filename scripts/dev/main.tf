@@ -143,6 +143,12 @@ resource "azurerm_application_gateway" "mlstudio" {
       rule_set_version = var.APP_GATEWAY_WAF_RULE_SET_VERSION
     }
   }
+  lifecycle {
+    ignore_changes = [
+      # ignore changes to all these configurations as these seem to change after creating ingress controller in AKS
+      request_routing_rule, probe, http_listener, backend_http_settings, backend_address_pool, tags
+    ]
+  }
 }
 
 resource "azurerm_role_assignment" "ra1" {

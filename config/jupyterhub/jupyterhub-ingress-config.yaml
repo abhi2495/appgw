@@ -5,11 +5,11 @@ kind: Ingress
 metadata:
   name: hub-ingress
 
-  namespace: ${JUPYTERHUB_NAMESPACE}
+  namespace: jupyterhub-mlstudio
 
   annotations:
     kubernetes.io/ingress.class: azure/application-gateway
-    appgw.ingress.kubernetes.io/backend-hostname: ${APPGW_FRONTEND_IP}
+    appgw.ingress.kubernetes.io/backend-hostname: 20.121.5.180
 
 spec:
   rules:

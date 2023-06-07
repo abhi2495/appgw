@@ -83,6 +83,7 @@ variable "APP_GATEWAY_SKU_CAPACITY" {
 
 variable "APP_GATEWAY_WAF_ENABLED" {
   description = "Is the Web Application Firewall enabled for App Gateway ?"
+  type        = bool
 }
 
 variable "APP_GATEWAY_WAF_FIREWALL_MODE" {
