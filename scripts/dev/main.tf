@@ -26,14 +26,6 @@ resource "azurerm_user_assigned_identity" "mlstudio" {
   tags                = var.TAGS
 }
 
-resource "azurerm_role_assignment" "network_contributor_rg" {
-  depends_on = [
-    azurerm_user_assigned_identity.mlstudio
-  ]
-  scope                = data.azurerm_resource_group.mlstudio.id
-  role_definition_name = "Network Contributor"
-  principal_id         = azurerm_user_assigned_identity.mlstudio.client_id
-}
 
 resource "azurerm_virtual_network" "mlstudio" {
   name                = var.VNET_NAME
@@ -155,7 +147,7 @@ resource "azurerm_role_assignment" "contributor_rg" {
     azurerm_user_assigned_identity.mlstudio
   ]
   scope                = data.azurerm_resource_group.mlstudio.id
-  role_definition_name = "Network Contributor"
+  role_definition_name = "Contributor"
   principal_id         = azurerm_user_assigned_identity.mlstudio.client_id
 }
 
