@@ -135,7 +135,7 @@ resource "azurerm_application_gateway" "mlstudio" {
 }
 
 resource "azurerm_role_assignment" "ra1" {
-  scope                = data.azurerm_subnet.aks.id
+  scope                = azurerm_subnet.aks.id
   role_definition_name = "Network Contributor"
   principal_id         = data.azuread_service_principal.mlstudio.object_id
   depends_on           = [azurerm_virtual_network.mlstudio]
