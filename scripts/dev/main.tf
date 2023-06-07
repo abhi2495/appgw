@@ -19,12 +19,12 @@ data "azurerm_resource_group" "mlstudio" {
   name = var.RESOURCE_GROUP_NAME
 }
 
-resource "azurerm_user_assigned_identity" "mlstudio" {
+/* resource "azurerm_user_assigned_identity" "mlstudio" {
   location            = var.AZ_REGION
   name                = var.MANAGED_IDENTITY_NAME
   resource_group_name = var.RESOURCE_GROUP_NAME
   tags                = var.TAGS
-}
+} */
 
 
 resource "azurerm_virtual_network" "mlstudio" {
@@ -136,10 +136,10 @@ resource "azurerm_application_gateway" "mlstudio" {
     backend_address_pool_name  = local.backend_address_pool_name
     backend_http_settings_name = local.http_setting_name
   }
-  identity {
+  /* identity {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.mlstudio.id]
-  }
+  } */
 }
 
 resource "azurerm_kubernetes_cluster" "mlstudio" {
@@ -154,9 +154,9 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
   tags                = var.TAGS
   dns_prefix          = var.AKS_DNS_PREFIX
 
-  ingress_application_gateway {
+  /* ingress_application_gateway {
     gateway_id = azurerm_application_gateway.mlstudio.id
-  }
+  } */
   network_profile {
     network_plugin = var.AKS_NETWORK_PLUGIN
     /* service_cidr   = var.AKS_SERVICE_CIDR
@@ -177,19 +177,10 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
     enable_node_public_ip = var.AKS_DEFAULT_NODE_POOL_ENABLE_NODE_PUBLIC_IP
   }
 
-  identity {
+  /* identity {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.mlstudio.id]
-  }
-}
-
-resource "azurerm_role_assignment" "contributor_rg" {
-  depends_on = [
-    azurerm_user_assigned_identity.mlstudio
-  ]
-  scope                = data.azurerm_resource_group.mlstudio.id
-  role_definition_name = "Contributor"
-  principal_id         = azurerm_user_assigned_identity.mlstudio.principal_id
+  } */
 }
 
 

@@ -35,3 +35,5 @@ TF_VAR_AKS:
     OS_DISK_SIZE: 128
     MAX_PODS: 30
     ENABLE_NODE_PUBLIC_IP: false
+  NAMESPACE_NAME: jupyterhub-mlstudio
+HELM_CHART_NAME: jupyterhub-mlstudio
