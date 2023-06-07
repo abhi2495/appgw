@@ -2,6 +2,19 @@ variable "RESOURCE_GROUP_NAME" {
   description = "Resource Group Name for Infra deployment"
 }
 
+variable "AZ_SPN_DISPLAY_NAME" {
+  description = "Display name of the service principal"
+}
+
+variable "AZ_SPN_CLIENT_ID" {
+  description = "Client id of the service principal"
+}
+
+variable "AZ_SPN_CLIENT_SECRET" {
+  description = "Client Secret of the service principal"
+}
+
+
 variable "MANAGED_IDENTITY_NAME" {
   description = "Name of the managed identity"
 }

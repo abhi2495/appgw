@@ -82,8 +82,7 @@ locals {
 resource "azurerm_application_gateway" "mlstudio" {
   depends_on = [
     azurerm_public_ip.mlstudio,
-    azurerm_subnet.appgw,
-    azurerm_user_assigned_identity.mlstudio
+    azurerm_subnet.appgw
   ]
   name                = var.APP_GATEWAY_NAME
   resource_group_name = var.RESOURCE_GROUP_NAME
@@ -132,10 +131,6 @@ resource "azurerm_application_gateway" "mlstudio" {
     http_listener_name         = local.http_listener_name
     backend_address_pool_name  = local.backend_address_pool_name
     backend_http_settings_name = local.http_setting_name
-  }
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.mlstudio.id]
   }
 }
 
@@ -209,10 +204,9 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
     enable_node_public_ip = var.AKS_DEFAULT_NODE_POOL_ENABLE_NODE_PUBLIC_IP
   }
 
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.mlstudio.id]
-  }
+  service_principal {
+    client_id     = var.AZ_SPN_CLIENT_ID
+    client_secret = var.AZ_SPN_CLIENT_SECRET
 }
 
 
