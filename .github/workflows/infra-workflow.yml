@@ -9,74 +9,74 @@ on:
         required: true
 
 jobs:
-  create-azure-resources:
-    runs-on: ubuntu-latest
-    environment:
-      name: "${{ github.event.inputs.env }}"
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+  # create-azure-resources:
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: "${{ github.event.inputs.env }}"
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Storing Azure Credentials as Env variables
-        run: |
-          echo "ARM_CLIENT_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.clientId')" >> $GITHUB_ENV
-          echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.clientSecret')" >> $GITHUB_ENV
-          echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.subscriptionId')" >> $GITHUB_ENV
-          echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.tenantId')" >> $GITHUB_ENV
+  #     - name: Storing Azure Credentials as Env variables
+  #       run: |
+  #         echo "ARM_CLIENT_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.clientId')" >> $GITHUB_ENV
+  #         echo "ARM_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.clientSecret')" >> $GITHUB_ENV
+  #         echo "ARM_SUBSCRIPTION_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.subscriptionId')" >> $GITHUB_ENV
+  #         echo "ARM_TENANT_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.tenantId')" >> $GITHUB_ENV
 
-          echo "TF_VAR_AZ_SPN_CLIENT_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.clientId')" >> $GITHUB_ENV
-          echo "TF_VAR_AZ_SPN_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.clientSecret')" >> $GITHUB_ENV
+  #         echo "TF_VAR_AZ_SPN_CLIENT_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.clientId')" >> $GITHUB_ENV
+  #         echo "TF_VAR_AZ_SPN_CLIENT_SECRET=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.clientSecret')" >> $GITHUB_ENV
 
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #     - name: Azure login
+  #       uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Load environment variables
-        uses: dcarbone/yaml-to-env-action@v1.0.0
-        with:
-          debug: "${{ inputs.debug }}"
-          yaml-file: "./config/${{ github.event.inputs.env }}.yml"
-          yq-version: "4.27.5"
+  #     - name: Load environment variables
+  #       uses: dcarbone/yaml-to-env-action@v1.0.0
+  #       with:
+  #         debug: "${{ inputs.debug }}"
+  #         yaml-file: "./config/${{ github.event.inputs.env }}.yml"
+  #         yq-version: "4.27.5"
 
-      - name: Install Terraform
-        uses: autero1/action-terraform@v1.1.1
-        with:
-          terraform_version: 1.2.8
+  #     - name: Install Terraform
+  #       uses: autero1/action-terraform@v1.1.1
+  #       with:
+  #         terraform_version: 1.2.8
 
-      - name: Create Resource Group if not exist
-        run: |
-          chmod +x ./scripts/create-rg-if-not-exists.sh
-          ./scripts/create-rg-if-not-exists.sh --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --location ${{ env.TF_VAR_AZ_REGION }} --cost-center-id ${{ env.COST_CENTER_ID_TAG }} --customer ${{ env.CUSTOMER_TAG }} --environment-type ${{ env.ENVIRONMENT_TYPE_TAG }} --product-group "${{ env.PRODUCT_GROUP_TAG }}"
+  #     - name: Create Resource Group if not exist
+  #       run: |
+  #         chmod +x ./scripts/create-rg-if-not-exists.sh
+  #         ./scripts/create-rg-if-not-exists.sh --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --location ${{ env.TF_VAR_AZ_REGION }} --cost-center-id ${{ env.COST_CENTER_ID_TAG }} --customer ${{ env.CUSTOMER_TAG }} --environment-type ${{ env.ENVIRONMENT_TYPE_TAG }} --product-group "${{ env.PRODUCT_GROUP_TAG }}"
 
-      - name: Create Storage Account For Terraform Backend(if not exists)
-        run: |
-          chmod +x ./scripts/create-tf-backend-if-not-exists.sh
-          ./scripts/create-tf-backend-if-not-exists.sh --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --location ${{ env.TF_VAR_AZ_REGION }} \
-                         --storage-account-name ${{ env.TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME }} --container-name ${{ env.TERRAFORM_BACKEND_CONTAINER_NAME }}
+  #     - name: Create Storage Account For Terraform Backend(if not exists)
+  #       run: |
+  #         chmod +x ./scripts/create-tf-backend-if-not-exists.sh
+  #         ./scripts/create-tf-backend-if-not-exists.sh --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --location ${{ env.TF_VAR_AZ_REGION }} \
+  #                        --storage-account-name ${{ env.TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME }} --container-name ${{ env.TERRAFORM_BACKEND_CONTAINER_NAME }}
 
-      - name: Initialize Terraform
-        run: terraform init -input=false -backend-config="resource_group_name=${{ env.TF_VAR_RESOURCE_GROUP_NAME }}" -backend-config="storage_account_name=${{ env.TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=${{ env.TERRAFORM_BACKEND_CONTAINER_NAME }}"
-        working-directory: scripts/${{ github.event.inputs.env }}
+  #     - name: Initialize Terraform
+  #       run: terraform init -input=false -backend-config="resource_group_name=${{ env.TF_VAR_RESOURCE_GROUP_NAME }}" -backend-config="storage_account_name=${{ env.TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=${{ env.TERRAFORM_BACKEND_CONTAINER_NAME }}"
+  #       working-directory: scripts/${{ github.event.inputs.env }}
 
-      # - name: Destroy Terraform plan
-      #   id: destroy
-      #   run: terraform destroy -auto-approve
-      #   working-directory: scripts/${{ github.event.inputs.env }}
+  #     # - name: Destroy Terraform plan
+  #     #   id: destroy
+  #     #   run: terraform destroy -auto-approve
+  #     #   working-directory: scripts/${{ github.event.inputs.env }}
 
-      - name: Create Terraform plan
-        id: plan
-        run: terraform plan -input=false -no-color
-        working-directory: scripts/${{ github.event.inputs.env }}
+  #     - name: Create Terraform plan
+  #       id: plan
+  #       run: terraform plan -input=false -no-color
+  #       working-directory: scripts/${{ github.event.inputs.env }}
 
-      - name: Apply Terraform plan
-        run: terraform apply -auto-approve -input=false
-        working-directory: scripts/${{ github.event.inputs.env }}
+  #     - name: Apply Terraform plan
+  #       run: terraform apply -auto-approve -input=false
+  #       working-directory: scripts/${{ github.event.inputs.env }}
 
   install-jupyterhub:
     runs-on: ubuntu-latest
-    needs: [create-azure-resources]
+    # needs: [create-azure-resources]
     environment:
       name: "${{ github.event.inputs.env }}"
     steps:
@@ -102,21 +102,23 @@ jobs:
           resource-group: ${{ env.TF_VAR_RESOURCE_GROUP_NAME }}
           cluster-name: ${{ env.TF_VAR_AKS_NAME }}
 
-      - name: Install jupyterhub helm chart
-        run: |
-          helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
-          helm repo update
-          helm upgrade \
-            --cleanup-on-fail \
-            --install ${{ env.HELM_CHART_NAME }} jupyterhub/jupyterhub \
-            --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} \
-            --create-namespace \
-            --version=2.0.0 \
-            --values config/jupyterhub/jupyterhub-helm-config.yaml
+      # - name: Install jupyterhub helm chart
+      #   run: |
+      #     helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+      #     helm repo update
+      #     helm upgrade \
+      #       --cleanup-on-fail \
+      #       --install ${{ env.HELM_CHART_NAME }} jupyterhub/jupyterhub \
+      #       --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} \
+      #       --create-namespace \
+      #       --version=2.0.0 \
+      #       --values config/jupyterhub/jupyterhub-helm-config.yaml
 
       - name: Create kubernetes ingress
+        working-directory: ./config/jupyterhub
         run: |
           ipAddress=$(az network public-ip show -n ${{ env.TF_VAR_PUBLIC_IP_NAME }} -g ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --query ipAddress -o tsv)
-          sed -i 's|${JUPYTERHUB_NAMESPACE}|${{ env.TF_VAR_AKS_NAMESPACE_NAME }}|'  config/jupyterhub/jupyterhub-ingress-config.yaml
-          sed -i "s|${APPGW_FRONTEND_IP}|$ipAddress|"  config/jupyterhub/jupyterhub-ingress-config.yaml
-          cat config/jupyterhub/jupyterhub-ingress-config.yaml
+          echo $ipAddress
+          sed -i 's|${JUPYTERHUB_NAMESPACE}|${{ env.TF_VAR_AKS_NAMESPACE_NAME }}|'  jupyterhub-ingress-config.yaml
+          sed -i "s|${APPGW_FRONTEND_IP}|$ipAddress|"  jupyterhub-ingress-config.yaml
+          cat jupyterhub-ingress-config.yaml
