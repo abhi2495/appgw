@@ -142,16 +142,6 @@ resource "azurerm_application_gateway" "mlstudio" {
   }
 }
 
-resource "azurerm_role_assignment" "contributor_rg" {
-  depends_on = [
-    azurerm_user_assigned_identity.mlstudio
-  ]
-  scope                = data.azurerm_resource_group.mlstudio.id
-  role_definition_name = "Contributor"
-  principal_id         = azurerm_user_assigned_identity.mlstudio.client_id
-}
-
-
 resource "azurerm_kubernetes_cluster" "mlstudio" {
   depends_on = [
     azurerm_application_gateway.mlstudio,
@@ -192,3 +182,14 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
     identity_ids = [azurerm_user_assigned_identity.mlstudio.id]
   }
 }
+
+resource "azurerm_role_assignment" "contributor_rg" {
+  depends_on = [
+    azurerm_user_assigned_identity.mlstudio
+  ]
+  scope                = data.azurerm_resource_group.mlstudio.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_user_assigned_identity.mlstudio.principal_id
+}
+
+
