@@ -76,7 +76,7 @@ jobs:
 
   install-jupyterhub:
     runs-on: ubuntu-latest
-    # needs: [create-azure-resources]
+    needs: [create-azure-resources]
     environment:
       name: "${{ github.event.inputs.env }}"
     steps:
