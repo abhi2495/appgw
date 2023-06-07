@@ -81,6 +81,23 @@ variable "APP_GATEWAY_SKU_CAPACITY" {
   description = "The Capacity of the SKU to use for this Application Gateway. When using a V1 SKU this value must be between 1 and 32, and 1 to 125 for a V2 SKU. This property is optional if autoscale_configuration is set."
 }
 
+variable "APP_GATEWAY_WAF_ENABLED" {
+  description = "Is the Web Application Firewall enabled for App Gateway ?"
+}
+
+variable "APP_GATEWAY_WAF_FIREWALL_MODE" {
+  description = "The Web Application Firewall Mode. Possible values are Detection and Prevention."
+}
+
+variable "APP_GATEWAY_WAF_RULE_SET_TYPE" {
+  description = "The Type of the Rule Set used for this Web Application Firewall. Possible values are OWASP and Microsoft_BotManagerRuleSet."
+}
+
+variable "APP_GATEWAY_WAF_RULE_SET_VERSION" {
+  description = "The Version of the Rule Set used for this Web Application Firewall. Possible values are 0.1, 1.0, 2.2.9, 3.0, 3.1 and 3.2."
+}
+
+
 variable "AKS_NAME" {
   description = "The name of the Managed Kubernetes Cluster to create."
 }

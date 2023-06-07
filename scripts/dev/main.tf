@@ -132,6 +132,21 @@ resource "azurerm_application_gateway" "mlstudio" {
     backend_address_pool_name  = local.backend_address_pool_name
     backend_http_settings_name = local.http_setting_name
   }
+  waf_configuration {
+    enabled = var.WAF_ENABLED
+
+  }
+  dynamic "waf_configuration" {
+
+    for_each = var.APP_GATEWAY_WAF_ENABLED == true ? toset([1]) : toset([])
+
+    content {
+      enabled          = var.APP_GATEWAY_WAF_ENABLED
+      firewall_mode    = var.APP_GATEWAY_WAF_FIREWALL_MODE
+      rule_set_type    = var.APP_GATEWAY_WAF_RULE_SET_TYPE
+      rule_set_version = var.APP_GATEWAY_WAF_RULE_SET_VERSION
+    }
+  }
 }
 
 resource "azurerm_role_assignment" "ra1" {

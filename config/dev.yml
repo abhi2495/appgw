@@ -27,6 +27,11 @@ TF_VAR_APP_GATEWAY:
   SKU_NAME: WAF_v2
   SKU_TIER: WAF_v2
   SKU_CAPACITY: 2
+  WAF:
+    ENABLED: true
+    FIREWALL_MODE: Prevention
+    RULE_SET_TYPE: OWASP
+    RULE_SET_VERSION: 3.2
 TF_VAR_AKS:
   NAME: aks-plat-mlstudio-dev
   NETWORK_PLUGIN: azure
