@@ -2,9 +2,14 @@ TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME: stgtfbackenddev2
 TERRAFORM_BACKEND_CONTAINER_NAME: cnt-tf-backend
 TF_VAR_AZ_SPN_DISPLAY_NAME: spn-dev-platform-analytics-mfe
 TF_VAR_AZ_REGION: eastus
-TF_VAR_RESOURCE_GROUP_NAME: rg-plat-mlstudio-tf
+TF_VAR_RESOURCE_GROUP_NAME: rg-plat-mlstudio-two
 TF_VAR_MANAGED_IDENTITY_NAME: mi-plat-mlstudio-dev
 TF_VAR_TAGS: '{"Cost_Center_ID":"474000","Customer":"Internal","Environment_Type":"Dev","Product_Group":"Luminate Platform","Created_By":"Terraform"}'
+COST_CENTER_ID_TAG: 474000
+CUSTOMER_TAG: Internal
+ENVIRONMENT_TYPE_TAG: Dev
+PRODUCT_GROUP_TAG: "Luminate Platform"
+CREATED_BY_TAG: Terraform
 TF_VAR_VNET:
   NAME: vnet-plat-mlstudio-dev
   ADDRESS: "10.1.0.0/16"
