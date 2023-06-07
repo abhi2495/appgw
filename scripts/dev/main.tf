@@ -207,6 +207,7 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
   service_principal {
     client_id     = var.AZ_SPN_CLIENT_ID
     client_secret = var.AZ_SPN_CLIENT_SECRET
+  }
 }
 
 
