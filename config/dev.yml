@@ -1,5 +1,6 @@
 TERRAFORM_BACKEND_STORAGE_ACCOUNT_NAME: stgtfbackenddev2
 TERRAFORM_BACKEND_CONTAINER_NAME: cnt-tf-backend
+TF_VAR_AZ_SPN_DISPLAY_NAME: spn-dev-platform-analytics-mfe
 TF_VAR_AZ_REGION: eastus
 TF_VAR_RESOURCE_GROUP_NAME: rg-plat-mlstudio-tf
 TF_VAR_MANAGED_IDENTITY_NAME: mi-plat-mlstudio-dev

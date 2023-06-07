@@ -19,6 +19,10 @@ data "azurerm_resource_group" "mlstudio" {
   name = var.RESOURCE_GROUP_NAME
 }
 
+data "azuread_service_principal" "mlstudio" {
+  display_name = var.AZ_SPN_DISPLAY_NAME
+}
+
 resource "azurerm_user_assigned_identity" "mlstudio" {
   location            = var.AZ_REGION
   name                = var.MANAGED_IDENTITY_NAME
@@ -102,26 +106,19 @@ resource "azurerm_application_gateway" "mlstudio" {
     name = local.frontend_port_name
     port = 80
   }
+  frontend_port {
+    name = "httpsPort"
+    port = 443
+  }
   backend_address_pool {
     name = local.backend_address_pool_name
   }
-  probe {
-    name                                      = local.health_probe_name
-    interval                                  = 30
-    protocol                                  = "Http"
-    path                                      = "/"
-    timeout                                   = 30
-    unhealthy_threshold                       = 3
-    pick_host_name_from_backend_http_settings = true
-  }
   backend_http_settings {
-    name                                = local.http_setting_name
-    cookie_based_affinity               = "Disabled"
-    port                                = 80
-    protocol                            = "Http"
-    request_timeout                     = 30
-    probe_name                          = local.health_probe_name
-    pick_host_name_from_backend_address = true
+    name                  = local.http_setting_name
+    cookie_based_affinity = "Disabled"
+    port                  = 80
+    protocol              = "Http"
+    request_timeout       = 30
   }
   http_listener {
     name                           = local.http_listener_name
@@ -142,6 +139,40 @@ resource "azurerm_application_gateway" "mlstudio" {
   }
 }
 
+resource "azurerm_role_assignment" "ra1" {
+  scope                = data.azurerm_subnet.aks.id
+  role_definition_name = "Network Contributor"
+  principal_id         = data.azuread_service_principal.mlstudio.object_id
+  depends_on           = [azurerm_virtual_network.mlstudio]
+}
+
+resource "azurerm_role_assignment" "ra2" {
+  scope                = azurerm_user_assigned_identity.mlstudio.id
+  role_definition_name = "Managed Identity Operator"
+  principal_id         = data.azuread_service_principal.mlstudio.object_id
+  depends_on           = [azurerm_user_assigned_identity.mlstudio]
+}
+
+resource "azurerm_role_assignment" "ra3" {
+  scope                = azurerm_application_gateway.mlstudio.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_user_assigned_identity.mlstudio.principal_id
+  depends_on = [
+    azurerm_user_assigned_identity.mlstudio,
+    azurerm_application_gateway.mlstudio,
+  ]
+}
+
+resource "azurerm_role_assignment" "ra4" {
+  scope                = data.azurerm_resource_group.mlstudio.id
+  role_definition_name = "Reader"
+  principal_id         = azurerm_user_assigned_identity.mlstudio.principal_id
+  depends_on = [
+    azurerm_user_assigned_identity.mlstudio,
+    azurerm_application_gateway.mlstudio,
+  ]
+}
+
 resource "azurerm_kubernetes_cluster" "mlstudio" {
   depends_on = [
     azurerm_application_gateway.mlstudio,
@@ -154,9 +185,10 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
   tags                = var.TAGS
   dns_prefix          = var.AKS_DNS_PREFIX
 
-  /* ingress_application_gateway {
+  ingress_application_gateway {
     gateway_id = azurerm_application_gateway.mlstudio.id
-  } */
+  }
+
   network_profile {
     network_plugin = var.AKS_NETWORK_PLUGIN
     /* service_cidr   = var.AKS_SERVICE_CIDR
