@@ -48,7 +48,7 @@ jobs:
       - name: Create Resource Group if not exist
         run: |
           chmod +x ./scripts/create-rg-if-not-exists.sh
-          ./scripts/create-rg-if-not-exists.sh --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --location ${{ env.TF_VAR_AZ_REGION }} --cost-center-id ${{ env.COST_CENTER_ID_TAG }} --customer ${{ env.CUSTOMER_TAG }} --environment-type ${{ env.ENVIRONMENT_TYPE_TAG }} --product-group ${{ env.PRODUCT_GROUP_TAG }}
+          ./scripts/create-rg-if-not-exists.sh --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --location ${{ env.TF_VAR_AZ_REGION }} --cost-center-id ${{ env.COST_CENTER_ID_TAG }} --customer ${{ env.CUSTOMER_TAG }} --environment-type ${{ env.ENVIRONMENT_TYPE_TAG }} --product-group \"${{ env.PRODUCT_GROUP_TAG }}\"
 
       # - name: Create Storage Account For Terraform Backend(if not exists)
       #   run: |

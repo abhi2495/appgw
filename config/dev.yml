@@ -9,7 +9,6 @@ COST_CENTER_ID_TAG: 474000
 CUSTOMER_TAG: Internal
 ENVIRONMENT_TYPE_TAG: Dev
 PRODUCT_GROUP_TAG: "Luminate Platform"
-CREATED_BY_TAG: Terraform
 TF_VAR_VNET:
   NAME: vnet-plat-mlstudio-dev
   ADDRESS: "10.1.0.0/16"
