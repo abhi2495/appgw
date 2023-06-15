@@ -188,3 +188,9 @@ variable "ACR_NAME" {
 variable "ACR_SKU" {
   description = "The SKU name of the container registry. Possible values are Basic, Standard and Premium"
 }
+
+variable "STORAGE_ACCOUNT_ALLOW_NESTED_ITEMS_TO_BE_PUBLIC" {
+  type        = bool
+  description = "Allow or disallow nested items within this Account to opt into being public."
+  default     = false
+}

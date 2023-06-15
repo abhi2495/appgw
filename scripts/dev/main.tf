@@ -228,12 +228,13 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
 }
 
 resource "azurerm_storage_account" "mlstudio" {
-  name                     = var.STORAGE_ACCOUNT_NAME
-  resource_group_name      = var.RESOURCE_GROUP_NAME
-  location                 = var.AZ_REGION
-  account_tier             = var.STORAGE_ACCOUNT_TIER
-  account_replication_type = var.STORAGE_ACCOUNT_REPLICATION_TYPE
-  tags                     = var.TAGS
+  name                            = var.STORAGE_ACCOUNT_NAME
+  resource_group_name             = var.RESOURCE_GROUP_NAME
+  location                        = var.AZ_REGION
+  account_tier                    = var.STORAGE_ACCOUNT_TIER
+  account_replication_type        = var.STORAGE_ACCOUNT_REPLICATION_TYPE
+  allow_nested_items_to_be_public = var.STORAGE_ACCOUNT_ALLOW_NESTED_ITEMS_TO_BE_PUBLIC
+  tags                            = var.TAGS
 }
 
 data "azurerm_client_config" "current" {}

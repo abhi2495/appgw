@@ -50,7 +50,8 @@ HELM_CHART_NAME: jupyterhub-mlstudio
 TF_VAR_STORAGE_ACCOUNT:
   NAME: stgplatmlstudiodev
   TIER: Standard
-  REPLICATION_TYPE: RAGRS
+  REPLICATION_TYPE: GRS
+  ALLOW_NESTED_ITEMS_TO_BE_PUBLIC: false
 TF_VAR_KEYVAULT:
   NAME: kv-plat-mlstudio-dev
 TF_VAR_ACR:
