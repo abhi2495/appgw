@@ -194,7 +194,7 @@ resource "azurerm_role_assignment" "ra5" {
   ]
 }
 
-resource "azurerm_kubernetes_cluster" "mlstudio" {
+/* resource "azurerm_kubernetes_cluster" "mlstudio" {
   depends_on = [
     azurerm_application_gateway.mlstudio,
     azurerm_subnet.aks,
@@ -239,7 +239,7 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
     client_id     = var.AZ_SPN_CLIENT_ID
     client_secret = var.AZ_SPN_CLIENT_SECRET
   } */
-}
+} */
 
 resource "azurerm_storage_account" "mlstudio" {
   name                            = var.STORAGE_ACCOUNT_NAME
