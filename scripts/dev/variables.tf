@@ -163,3 +163,28 @@ variable "AKS_DEFAULT_NODE_POOL_ENABLE_NODE_PUBLIC_IP" {
   description = "Should nodes in this Node Pool have a Public IP Address?"
   default     = false
 }
+
+variable "STORAGE_ACCOUNT_NAME" {
+  description = "Specifies the name of the storage account. Changing this forces a new resource to be created. This must be unique across the entire Azure service, not just within the resource group."
+}
+
+variable "STORAGE_ACCOUNT_TIER" {
+  description = "Defines the Tier to use for this storage account. Valid options are Standard and Premium. For BlockBlobStorage and FileStorage accounts only Premium is valid."
+}
+
+variable "STORAGE_ACCOUNT_REPLICATION_TYPE" {
+  description = "Defines the type of replication to use for this storage account. Valid options are LRS, GRS, RAGRS, ZRS, GZRS and RAGZRS."
+}
+
+variable "KEYVAULT_NAME" {
+  description = "Specifies the name of the Key Vault. Changing this forces a new resource to be created. The name must be globally unique. If the vault is in a recoverable state then the vault will need to be purged before reusing the name."
+}
+
+variable "ACR_NAME" {
+  description = "Specifies the name of the Container Registry. Only Alphanumeric characters allowed. Changing this forces a new resource to be created."
+}
+
+
+variable "ACR_SKU" {
+  description = "The SKU name of the container registry. Possible values are Basic, Standard and Premium"
+}

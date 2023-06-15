@@ -1,7 +1,217 @@
-debug:
-  enabled: true
-
 proxy:
   service:
     annotations:
       service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+
+debug:
+  enabled: true
+
+singleuser:
+  networkPolicy:
+    enabled: false
+  extraLabels:
+    aadpodidbinding: jh-pod-identity
+  image:
+    name: bymlstudiodevacr01.azurecr.io/mlscore/by_mlstudio_notebook
+    tag: sha-c864dde
+    pullSecrets:
+      - regcred
+  storage:
+    type: none
+    dynamic:
+      storageClass: managed-csi
+    homeMountPath: /home/jovyan/home
+
+  extraEnv:
+    JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
+
+  extraFiles:
+    # jupyter_notebook_config reference: https://jupyter-notebook.readthedocs.io/en/stable/config.html
+    jupyter_notebook_config.json:
+      mountPath: /etc/jupyter/jupyter_notebook_config.json
+      # data is a YAML structure here but will be rendered to JSON file as our
+      # file extension is ".json".
+      data:
+        ServerApp:
+          disable_check_xsrf: True
+          tornado_settings:
+            headers:
+              Content-Security-Policy: "frame-ancestors bymlspocwebapp01.azurewebsites.net 'self' * localhost:7777  localhost:3000"
+            cookie_options:
+              SameSite: "None"
+              Secure: True
+hub:
+  pdb:
+    enabled: false
+  networkPolicy:
+    enabled: false
+  image:
+    name: bymlstudiodevacr01.azurecr.io/jupyterhub-jwt-auth
+    tag: sha-ec400bc
+
+  labels:
+    aadpodidbinding: jh-pod-identity
+  extraFiles:
+    page_html:
+      # It is a one of file with our changes. It is specifically set to be a template.
+      mountPath: /srv/jupyterhub/templates/page.html
+    error_html:
+      # It is a one of file with our changes. It is specifically set to be a template.
+      mountPath: /srv/jupyterhub/templates/error.html
+  extraVolumes:
+    - name: hub-secrets
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: "hub-class-provider" # secret provider class name
+  extraVolumeMounts:
+    - name: hub-secrets
+      mountPath: "/srv/secrets-store"
+      readOnly: true
+  extraEnv:
+    tenant_metadata_url: "https://api-tst.jdadelivers.com/mlstudio/tenant-metadata/v1/tenant-config"
+  extraConfig:
+    01-custom-attr-spawner: print ( "\n\n *** \n ", str(c.NotebookApp), "\n", str(c.SingleUserNotebookApp))
+    preSpawnHook: |
+      import os
+      import requests
+      import msal
+      import jwt
+
+      async def get_user_config(spawner):
+        def retrieve_info_from_identity_context():
+          env_name=f"BY_TOKEN_{spawner.user.name.replace('-', '_')}"
+          token=os.getenv(env_name)
+          if token:
+            return jwt.decode(token, options={"verify_signature": False})
+            
+          else:
+            err_msg="User token is not provided"
+            spawner.log.error(err_msg)
+            raise ValueError(err_msg)
+        def read_secret(filename, mount_path="/srv/secrets-store"):
+          filepath=os.path.join(mount_path, filename)
+          with open(filepath, 'r') as f:
+            return f.read()
+
+        def fetch_access_token(tenant, by_api_id, client_id, client_secret):
+          authority_url = f"https://login.microsoftonline.com/{tenant}" # /oauth2/v2.0/token"
+          scope = f"https://{tenant}/{by_api_id}/.default"
+          app = msal.ConfidentialClientApplication(
+              client_id, 
+              authority=authority_url,
+              client_credential=client_secret)
+          result = app.acquire_token_for_client(scopes=scope)
+          access_token = result['access_token']
+          return access_token
+        
+        spawner.debug = True
+        spawner.http_timeout=3600
+        spawner.log.info("start")
+        
+        spawner.log.info("added secret provider class 'client-id-class-provider'")
+        spawner.log.info(f"mounted secrets: {os.listdir('/srv/secrets-store')}")
+        # get credentials for retrieving access token
+        client_id =  read_secret('CLIENT-ID')
+        client_secret = read_secret('CLIENT-SECRET')
+        tenant =  read_secret('TENANT-NAME')
+        by_api_id = read_secret('BY-API-ID')
+
+        # fetch auth token
+        access_token=fetch_access_token(tenant, by_api_id, client_id, client_secret)
+        spawner.log.info("access token successfully fetched")
+        # get user info from identity-context token
+        user_info=retrieve_info_from_identity_context()
+        # fetch data from tenant metadata service
+        tenant_metadata_url = os.environ["tenant_metadata_url"]
+        # TODO: replace "sub": "Data_Engineer" in request parameters to "sub": user_info["sub"] once tenant metadata is ready
+        tenant_metadata = requests.get(tenant_metadata_url,params={"sub": "Data_Engineer", "realm_id": user_info["by_realm_id"]},headers={'Authorization': 'bearer ' + access_token})
+        response=tenant_metadata.json()
+        spawner.log.info("Tenant metadata response data %s", response)
+
+        # It is a sample of code for dynamically adding secret provider class
+        # based on needed condition, replace condition with needed one 
+        if tenant_metadata.ok and response.get('security_provider_class'):
+          spawner.volumes.extend([
+            {
+              "csi":{
+                  "driver":"secrets-store.csi.k8s.io",
+                  "readOnly":True,
+                  "volumeAttributes":{
+                    "secretProviderClass": response.get('security_provider_class')
+                  }
+              },
+              "name":"secrets-az-inline"
+            }
+          ])
+          spawner.volume_mounts.extend([
+            {
+                "mountPath":"/mnt/secrets",
+                "name":"secrets-az-inline",
+                "readOnly":True
+            }
+          ])
+          spawner.log.info("added secret provider class")
+        else:
+          spawner.log.info("tenant metadata condition is not matched")
+        # It is a sample of code for dynamically mounting blob container 
+        if tenant_metadata.ok and response.get('container_name'):
+          spawner.volumes.extend([
+            
+            {
+              "persistentVolumeClaim": {"claimName": f"pvc-{response.get('container_name')}-blob"},
+              "name":"jupyterhub-shared"
+            }
+          ])
+          spawner.volume_mounts.extend([
+            {
+                "mountPath":"/home/jovyan/by-shared",
+                "name":"jupyterhub-shared"
+            }
+          ])
+          spawner.log.info("added blob pvc")
+        else:
+          spawner.log.info("blob pvc is not mounted")
+      c.KubeSpawner.pre_spawn_hook = get_user_config
+
+  config:
+    JupyterHub:
+      # Specify settings for authenticator in Jupyter Hub. Specifically, authenticator class. It must be installed with JupyterHub.
+      authenticator_class: "jwtauthenticator.platform_authenticator.PlatformAuthenticator"
+
+      # It is a path for templates. There is implemented an authenticator logic using login with portal app.
+      template_paths:
+        - /srv/jupyterhub/templates
+
+      # Trigger implicit spawns after this many seconds.
+      implicit_spawn_seconds: 0.001
+
+      # To connect to specific database instance using mssql, please use next paameter.
+      # db_url: mssql+pymssql://<user>:<password>@<serverName>/<databaseName>
+
+      tornado_settings:
+        # We have a large token. That is why we need this feature to set. Otherwise, size of header is larger and error page is shown.
+        max_header_size: 4096
+
+        headers:
+          # This is CSP for jupyter hub.
+          Content-Security-Policy: "frame-ancestors bymlspocwebapp01.azurewebsites.net 'self' * localhost:7777 localhost:3000"
+        cookie_options:
+          SameSite: "None"
+          Secure: True
+
+      # Set default url. It is not working well, so it is used for redirecting the page to proper one in an error.htnl
+      default_url: "/lab"
+
+    # Configuring the token auth. It actually determines where we can see the user.
+    PlatformAuthenticator:
+      signing_certificate: "https://blueyonderinteroptestus.b2clogin.com/blueyonderinteroptestus.onmicrosoft.com/B2C_1A_signin/v2.0/.well-known/openid-configuration"
+      audience: ""
+      verify_user_has_access: by.lext.alm
+      param_is_authorization: False
+      param_name: access_token
+
+    # Specify settings for authenticator in Jupyter Hub.
+    Authenticator:
+      auto_login: true

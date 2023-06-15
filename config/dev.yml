@@ -47,3 +47,12 @@ TF_VAR_AKS:
     ENABLE_NODE_PUBLIC_IP: false
   NAMESPACE_NAME: jupyterhub-mlstudio
 HELM_CHART_NAME: jupyterhub-mlstudio
+TF_VAR_STORAGE_ACCOUNT:
+  NAME: stgplatmlstudiodev
+  TIER: Standard
+  REPLICATION_TYPE: RAGRS
+TF_VAR_KEYVAULT:
+  NAME: kv-plat-mlstudio-dev
+TF_VAR_ACR:
+  NAME: acrplatmlstudiodev
+  SKU: Standard

@@ -102,22 +102,36 @@ jobs:
           resource-group: ${{ env.TF_VAR_RESOURCE_GROUP_NAME }}
           cluster-name: ${{ env.TF_VAR_AKS_NAME }}
 
-      - name: Install jupyterhub helm chart
+      - name: Add aks-preview extension
         run: |
-          helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
-          helm repo update
-          helm upgrade \
-            --cleanup-on-fail \
-            --install ${{ env.HELM_CHART_NAME }} jupyterhub/jupyterhub \
-            --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} \
-            --create-namespace \
-            --version=2.0.0 \
-            --values config/jupyterhub/jupyterhub-helm-config.yaml
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az extension add --name aks-preview
+          az extension update --name aks-preview
+          az aks update --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --name ${{ env.TF_VAR_AKS_NAME }} --enable-pod-identity --enable-pod-identity-with-kubenet
+          az feature register --namespace "Microsoft.ContainerService" --name "EnablePodIdentityPreview"
+          az provider register -n Microsoft.ContainerService
 
-      - name: Create kubernetes ingress
-        working-directory: ./config/jupyterhub
+      - name: Create namespace and secrets
         run: |
-          ipAddress=$(az network public-ip show -n ${{ env.TF_VAR_PUBLIC_IP_NAME }} -g ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --query ipAddress -o tsv)
-          sed -i 's|${JUPYTERHUB_NAMESPACE}|${{ env.TF_VAR_AKS_NAMESPACE_NAME }}|'  jupyterhub-ingress-config.yaml
-          sed -i 's|${APPGW_FRONTEND_IP}|'"$ipAddress"'|'  jupyterhub-ingress-config.yaml
-          kubectl apply -f jupyterhub-ingress-config.yaml
+          kubectl get namespace | grep -q "^${{ env.TF_VAR_AKS_NAMESPACE_NAME }} " || kubectl create namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }}
+      #     kubectl create secret docker-registry regcred --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} --docker-server="${{ env.DOCKER_USERNAME }}.azurecr.io" --docker-username="${{ env.DOCKER_USERNAME }}" --docker-password="${{ env.DOCKER_PASS }}"
+
+      # - name: Install jupyterhub helm chart
+      #   run: |
+      #     helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+      #     helm repo update
+      #     helm upgrade \
+      #       --cleanup-on-fail \
+      #       --install ${{ env.HELM_CHART_NAME }} jupyterhub/jupyterhub \
+      #       --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} \
+      #       --create-namespace \
+      #       --version=2.0.0 \
+      #       --values config/jupyterhub/jupyterhub-helm-config.yaml
+
+      # - name: Create kubernetes ingress
+      #   working-directory: ./config/jupyterhub
+      #   run: |
+      #     ipAddress=$(az network public-ip show -n ${{ env.TF_VAR_PUBLIC_IP_NAME }} -g ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --query ipAddress -o tsv)
+      #     sed -i 's|${JUPYTERHUB_NAMESPACE}|${{ env.TF_VAR_AKS_NAMESPACE_NAME }}|'  jupyterhub-ingress-config.yaml
+      #     sed -i 's|${APPGW_FRONTEND_IP}|'"$ipAddress"'|'  jupyterhub-ingress-config.yaml
+      #     kubectl apply -f jupyterhub-ingress-config.yaml
