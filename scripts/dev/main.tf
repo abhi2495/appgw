@@ -194,52 +194,7 @@ resource "azurerm_role_assignment" "ra5" {
   ]
 }
 
-/* resource "azurerm_kubernetes_cluster" "mlstudio" {
-  depends_on = [
-    azurerm_application_gateway.mlstudio,
-    azurerm_subnet.aks,
-    azurerm_user_assigned_identity.mlstudio
-  ]
-  name                = var.AKS_NAME
-  location            = var.AZ_REGION
-  resource_group_name = var.RESOURCE_GROUP_NAME
-  tags                = var.TAGS
-  dns_prefix          = var.AKS_DNS_PREFIX
 
-  ingress_application_gateway {
-    gateway_id = azurerm_application_gateway.mlstudio.id
-  }
-
-  network_profile {
-    network_plugin = var.AKS_NETWORK_PLUGIN
-    /* service_cidr   = var.AKS_SERVICE_CIDR
-    dns_service_ip = var.AKS_DNS_SERVICE_IP */
-  }
-  default_node_pool {
-    name                  = "default"
-    node_count            = var.AKS_DEFAULT_NODE_POOL_COUNT
-    vm_size               = var.AKS_DEFAULT_NODE_POOL_VM_SIZE
-    vnet_subnet_id        = azurerm_subnet.aks.id
-    os_sku                = var.AKS_DEFAULT_NODE_POOL_OS
-    os_disk_size_gb       = var.AKS_DEFAULT_NODE_POOL_OS_DISK_SIZE
-    enable_auto_scaling   = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING
-    type                  = var.AKS_DEFAULT_NODE_POOL_TYPE
-    max_count             = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING == true ? var.AKS_DEFAULT_NODE_POOL_MAX_NODE_COUNT : null
-    min_count             = var.AKS_DEFAULT_NODE_POOL_ENABLE_AUTOSCALING == true ? var.AKS_DEFAULT_NODE_POOL_MIN_NODE_COUNT : null
-    max_pods              = var.AKS_DEFAULT_NODE_POOL_MAX_PODS
-    enable_node_public_ip = var.AKS_DEFAULT_NODE_POOL_ENABLE_NODE_PUBLIC_IP
-  }
-
-  identity {
-    type                      = "UserAssigned"
-    user_assigned_identity_id = azurerm_user_assigned_identity.mlstudio.id
-  }
-
-  /* service_principal {
-    client_id     = var.AZ_SPN_CLIENT_ID
-    client_secret = var.AZ_SPN_CLIENT_SECRET
-  } */
-} */
 
 resource "azurerm_storage_account" "mlstudio" {
   name                            = var.STORAGE_ACCOUNT_NAME
