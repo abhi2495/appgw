@@ -185,6 +185,15 @@ resource "azurerm_role_assignment" "ra4" {
   ]
 }
 
+resource "azurerm_role_assignment" "ra5" {
+  scope                = data.azurerm_resource_group.mlstudio.id
+  role_definition_name = "Virtual Machine Contributor"
+  principal_id         = azurerm_user_assigned_identity.mlstudio.principal_id
+  depends_on = [
+    azurerm_user_assigned_identity.mlstudio
+  ]
+}
+
 resource "azurerm_kubernetes_cluster" "mlstudio" {
   depends_on = [
     azurerm_application_gateway.mlstudio,
@@ -221,10 +230,15 @@ resource "azurerm_kubernetes_cluster" "mlstudio" {
     enable_node_public_ip = var.AKS_DEFAULT_NODE_POOL_ENABLE_NODE_PUBLIC_IP
   }
 
-  service_principal {
+  identity {
+    type                      = "UserAssigned"
+    user_assigned_identity_id = azurerm_user_assigned_identity.mlstudio.id
+  }
+
+  /* service_principal {
     client_id     = var.AZ_SPN_CLIENT_ID
     client_secret = var.AZ_SPN_CLIENT_SECRET
-  }
+  } */
 }
 
 resource "azurerm_storage_account" "mlstudio" {
