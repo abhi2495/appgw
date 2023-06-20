@@ -270,5 +270,6 @@ resource "azurerm_container_registry" "mlstudio" {
   resource_group_name = var.RESOURCE_GROUP_NAME
   location            = var.AZ_REGION
   sku                 = var.ACR_SKU
+  admin_enabled       = var.ACR_ADMIN_ENABLED
   tags                = var.TAGS
 }

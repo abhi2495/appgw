@@ -113,7 +113,9 @@ jobs:
 
       - name: Create namespace and secrets
         run: |
-          kubectl get namespace | grep -q "^${{ env.TF_VAR_AKS_NAMESPACE_NAME }} " || kubectl create namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }}
+          kubectl get namespace | grep -q "^${{ env.TF_VAR_AKS_NAMESPACE_NAME }}" || kubectl create namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }}
+          STORAGE_ACC_KEY=$(az storage account keys list --account-name ${{ env.TF_VAR_STORAGE_ACCOUNT_NAME }} --resource-group ${{ env.resource_group }} --query [0].value -o tsv)
+
       #     kubectl create secret docker-registry regcred --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} --docker-server="${{ env.DOCKER_USERNAME }}.azurecr.io" --docker-username="${{ env.DOCKER_USERNAME }}" --docker-password="${{ env.DOCKER_PASS }}"
 
       # - name: Install jupyterhub helm chart

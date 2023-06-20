@@ -57,3 +57,4 @@ TF_VAR_KEYVAULT:
 TF_VAR_ACR:
   NAME: acrplatmlstudiodev
   SKU: Standard
+  ADMIN_ENABLED: true

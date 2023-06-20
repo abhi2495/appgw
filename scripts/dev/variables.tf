@@ -194,3 +194,9 @@ variable "STORAGE_ACCOUNT_ALLOW_NESTED_ITEMS_TO_BE_PUBLIC" {
   description = "Allow or disallow nested items within this Account to opt into being public."
   default     = false
 }
+
+variable "ACR_ADMIN_ENABLED" {
+  type        = bool
+  description = "Specifies whether the admin user is enabled. Defaults to false."
+  default     = false
+}
