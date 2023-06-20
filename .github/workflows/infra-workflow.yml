@@ -116,10 +116,20 @@ jobs:
           kubectl get namespace | grep -q "^${{ env.TF_VAR_AKS_NAMESPACE_NAME }}" || kubectl create namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }}
 
           ACR_PASSWORD=$(az acr credential show --name ${{ env.TF_VAR_ACR_NAME }} --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --query passwords[0].value -o tsv)
-          kubectl create secret docker-registry regcred --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} --docker-server="${{ env.TF_VAR_ACR_NAME }}.azurecr.io" --docker-username="${{ env.TF_VAR_ACR_NAME }}" --docker-password="$ACR_PASSWORD"
+          kubectl create secret docker-registry regcred --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} --docker-server="${{ env.TF_VAR_ACR_NAME }}.azurecr.io" --docker-username="${{ env.TF_VAR_ACR_NAME }}" --docker-password="$ACR_PASSWORD" --save-config --dry-run=client -o yaml | kubectl apply -f -
 
           STORAGE_ACC_KEY=$(az storage account keys list --account-name ${{ env.TF_VAR_STORAGE_ACCOUNT_NAME }} --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --query [0].value -o tsv)
-          kubectl create secret generic az-sa-secret --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} --from-literal=azurestorageaccountname=${{ env.TF_VAR_STORAGE_ACCOUNT_NAME }} --from-literal=azurestorageaccountkey="$STORAGE_ACC_KEY"
+          kubectl create secret generic az-sa-secret --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} --from-literal=azurestorageaccountname=${{ env.TF_VAR_STORAGE_ACCOUNT_NAME }} --from-literal=azurestorageaccountkey="$STORAGE_ACC_KEY" --save-config --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create pod identity
+        run: |
+          IDENTITY_RESOURCE_ID=$(az identity show -g ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} -n ${{ env.TF_VAR_MANAGED_IDENTITY_NAME }} --query id -o tsv)
+          az aks pod-identity add --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --cluster-name ${{ env.TF_VAR_AKS_NAME }} --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} --name ${{ env.TF_VAR_AKS_POD_IDENTITY_NAME }} --identity-resource-id "$IDENTITY_RESOURCE_ID"
+
+      - name: Get azure identity and binding
+        run: |
+          kubectl get azureidentity -n ${{ env.TF_VAR_AKS_NAMESPACE_NAME }}
+          kubectl get azureidentitybinding -n ${{ env.TF_VAR_AKS_NAMESPACE_NAME }}
 
       # - name: Install jupyterhub helm chart
       #   run: |

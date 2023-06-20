@@ -46,6 +46,7 @@ TF_VAR_AKS:
     MAX_PODS: 30
     ENABLE_NODE_PUBLIC_IP: false
   NAMESPACE_NAME: jupyterhub-mlstudio
+  POD_IDENTITY_NAME: jh-pod-identity
 HELM_CHART_NAME: jupyterhub-mlstudio
 TF_VAR_STORAGE_ACCOUNT:
   NAME: stgplatmlstudiodev
