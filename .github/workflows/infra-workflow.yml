@@ -121,15 +121,32 @@ jobs:
           STORAGE_ACC_KEY=$(az storage account keys list --account-name ${{ env.TF_VAR_STORAGE_ACCOUNT_NAME }} --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --query [0].value -o tsv)
           kubectl create secret generic az-sa-secret --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} --from-literal=azurestorageaccountname=${{ env.TF_VAR_STORAGE_ACCOUNT_NAME }} --from-literal=azurestorageaccountkey="$STORAGE_ACC_KEY" --save-config --dry-run=client -o yaml | kubectl apply -f -
 
+      # The below step is run with a retry mechanism. Because while testing it has been noted that for the first time the "az aks pod-identity add" throws error saying "Cluster identity has no assignment permission over identity"
       - name: Create pod identity
-        run: |
-          IDENTITY_RESOURCE_ID=$(az identity show -g ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} -n ${{ env.TF_VAR_MANAGED_IDENTITY_NAME }} --query id -o tsv)
-          az aks pod-identity add --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --cluster-name ${{ env.TF_VAR_AKS_NAME }} --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} --name ${{ env.TF_VAR_AKS_POD_IDENTITY_NAME }} --identity-resource-id "$IDENTITY_RESOURCE_ID"
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 2
+          command: |
+            IDENTITY_RESOURCE_ID=$(az identity show -g ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} -n ${{ env.TF_VAR_MANAGED_IDENTITY_NAME }} --query id -o tsv)
+            az aks pod-identity add --resource-group ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} --cluster-name ${{ env.TF_VAR_AKS_NAME }} --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} --name ${{ env.TF_VAR_AKS_POD_IDENTITY_NAME }} --identity-resource-id "$IDENTITY_RESOURCE_ID"
 
       - name: Get azure identity and binding
         run: |
           kubectl get azureidentity -n ${{ env.TF_VAR_AKS_NAMESPACE_NAME }}
           kubectl get azureidentitybinding -n ${{ env.TF_VAR_AKS_NAMESPACE_NAME }}
+
+      - name: Adding permision to keyVault
+        run: |
+          IDENTITY_PRINCIPAL_ID=$(az identity show -g ${{ env.TF_VAR_RESOURCE_GROUP_NAME }} -n ${{ env.TF_VAR_MANAGED_IDENTITY_NAME }} --query principalId -o tsv)
+          az keyvault set-policy --name ${{ env.TF_VAR_KEYVAULT_NAME }} --object-id "$IDENTITY_PRINCIPAL_ID" --secret-permissions get list
+
+      - name: Create Secret Provider
+        run: |
+          KV_TENANT_ID=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.tenantId')
+          python3.8 scripts/compile-configs.py config/config-templates/secretproviderclass-hub.yml '{"key_vault_name": "${{ env.TF_VAR_KEYVAULT_NAME }}", "key_vault_tenant_id": "$KV_TENANT_ID" }' compiled-secretproviderclass-hub.yml
+          cat compiled-secretproviderclass-hub.yml
+          kubectl --namespace ${{ env.TF_VAR_AKS_NAMESPACE_NAME }} apply -f compiled-secretproviderclass-hub.yml
 
       # - name: Install jupyterhub helm chart
       #   run: |
